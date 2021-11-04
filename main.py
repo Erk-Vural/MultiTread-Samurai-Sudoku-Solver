@@ -61,8 +61,9 @@ def solve():
 
                 return
 
-    t.stop()
+
     print(np.matrix(grid))
+    t.stop()
     input("More?")  # Checks if other answers are available
 
 solve()
