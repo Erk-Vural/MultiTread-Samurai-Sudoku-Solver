@@ -1,13 +1,14 @@
 import numpy as np
+from timer import Timer
 
 grid = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 0, 1, 9, 5, 0, 0],
+        [6, 0, 0, 1, 9, 5, 0, 0, 0],
         [0, 9, 8, 0, 0, 0, 0, 6, 0],
         [8, 0, 0, 0, 6, 0, 0, 0, 3],
         [4, 0, 0, 8, 0, 3, 0, 0, 1],
         [7, 0, 0, 0, 2, 0, 0, 0, 6],
         [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 0, 4, 1, 9, 0, 5],
+        [0, 0, 0, 4, 1, 9, 0, 0, 5],
         [0, 0, 0, 0, 8, 0, 0, 7, 9],
         ]
 
@@ -15,7 +16,7 @@ print(np.matrix(grid))
 
 
 # Checks row col and block to confirm "n" is available
-def possible(x, y, n):
+def possible(y, x, n):
     global grid
     # Check col
     for i in range(0, 9):
@@ -46,6 +47,8 @@ def possible(x, y, n):
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
 def solve():
+    t = Timer()
+    t.start()
     global grid
     for y in range(9):
         for x in range(9):
@@ -57,8 +60,9 @@ def solve():
                         grid[y][x] = 0
 
                 return
+
+    t.stop()
     print(np.matrix(grid))
     input("More?")  # Checks if other answers are available
-
 
 solve()
