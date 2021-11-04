@@ -11,8 +11,9 @@ grid = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
         [0, 0, 0, 4, 1, 9, 0, 0, 5],
         [0, 0, 0, 0, 8, 0, 0, 7, 9],
         ]
-
+print("Start Version: ")
 print(np.matrix(grid))
+print("\n")
 
 
 # Checks row col and block to confirm "n" is available
@@ -61,8 +62,10 @@ def solve():
 
                 return
 
-
+    print("Final version: ")
     print(np.matrix(grid))
+    print("\n")
+
     t.stop()
     input("More?")  # Checks if other answers are available
 
