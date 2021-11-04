@@ -1,5 +1,20 @@
 import numpy as np
 from timer import Timer
+import os
+
+
+def check_file_exist():
+    if os.path.exists("./examples/solved/9x9(solved).txt"):
+        os.remove("./examples/solved/9x9(solved).txt")
+
+
+def write_results(y, x, n):
+    global f
+    f = open("./examples/solved/9x9(solved).txt", "a")
+    f.write(str(y + 1) + ", " + str(x + 1) + ", " + str(n))
+    f.write("\n")
+    f.close()
+
 
 grid = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
         [6, 0, 0, 1, 9, 5, 0, 0, 0],
@@ -50,13 +65,18 @@ def possible(y, x, n):
 def solve():
     t = Timer()
     t.start()
+
     global grid
+
     for y in range(9):
         for x in range(9):
             if grid[y][x] == 0:
                 for n in range(1, 10):
                     if possible(y, x, n):
                         grid[y][x] = n
+
+                        write_results(y, x, n)
+
                         solve()
                         grid[y][x] = 0
 
@@ -69,4 +89,6 @@ def solve():
     t.stop()
     input("More?")  # Checks if other answers are available
 
+
+check_file_exist()
 solve()
