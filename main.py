@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import pygame as pygame
 import os
+import time
 
 from timer import Timer
 
@@ -16,9 +17,16 @@ block_size = WINDOW_HEIGHT // 9  # Set the size of the grid block
 
 
 def set_text(x, y, n):
+    # Displays a number on that tile
     font = pygame.font.SysFont('arial', block_size)
     text = font.render(n, True, (0, 0, 0))
     SCREEN.blit(text, (x, y))
+
+
+def clear_rect(x, y):
+    rect = pygame.Rect(x, y, block_size, block_size)
+    SCREEN.fill(WHITE, rect)
+    pygame.draw.rect(SCREEN, BLACK, rect, 1)
 
 
 def draw_grid():
@@ -27,14 +35,21 @@ def draw_grid():
             rect = pygame.Rect(x, y, block_size, block_size)
             pygame.draw.rect(SCREEN, BLACK, rect, 1)
 
-            '''Displays a number on that tile'''
             value = str(grid[y // block_size][x // block_size])
             set_text(x, y, value)
 
     pygame.display.update()
 
 
-def update_grid():
+def update_grid(y, x, n):
+    x0 = x * block_size
+    y0 = y * block_size
+
+    clear_rect(x0, y0)
+
+    time.sleep(0.01)
+
+    set_text(x0, y0, str(n))
     pygame.display.update()
 
 
@@ -116,9 +131,11 @@ def solve():
                         grid[y][x] = n
 
                         write_results(y, x, n)
+                        update_grid(y,x,n)
 
                         solve()
                         grid[y][x] = 0
+
 
                 return
 
@@ -139,16 +156,15 @@ def main():
 
     read_matrix()
     check_file_exist()
+    draw_grid()
     solve()
 
     # Quit button
     while True:
-        draw_grid()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        pygame.display.update()
 
 
 main()
