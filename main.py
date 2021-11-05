@@ -1,10 +1,19 @@
-import sys
-import numpy as np
 import pygame as pygame
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 import os
+import sys
+
 import time
 
 from timer import Timer
+
+t = Timer()
+
+times = []
+results = []
 
 grid = []
 
@@ -53,14 +62,38 @@ def update_grid(y, x, n):
     pygame.display.update()
 
 
+# Graph
+def plot_graph():
+    # x - time
+    times.sort()
+    x = times
+    # y - Square Found
+
+    results.sort()
+    y = results
+
+    plt.plot(x, y)
+
+    plt.xticks(times[::800])
+
+    plt.xlabel('x - time')
+    plt.ylabel('y - Square Found')
+    plt.title('9x9 Sudoku Time-Found Graph')
+
+    plt.show()
+
+
 # I/O
 def check_file_exist():
-    if os.path.exists("./examples/solved/9x9(solved).txt"):
-        os.remove("./examples/solved/9x9(solved).txt")
+    if os.path.exists("./examples/solved/9x9(result).txt"):
+        os.remove("./examples/solved/9x9(result).txt")
 
 
 def write_results(y, x, n):
-    f = open("./examples/solved/9x9(solved).txt", "a")
+    global results
+    results.append(y * x)
+
+    f = open("./examples/solved/9x9(result).txt", "a")
     f.write(str(y + 1) + ", " + str(x + 1) + ", " + str(n))
     f.write("\n")
     f.close()
@@ -118,10 +151,8 @@ def possible(y, x, n):
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
 def solve():
-    t = Timer()
-    t.start()
-
     global grid
+    global t
 
     for y in range(9):
         for x in range(9):
@@ -130,6 +161,7 @@ def solve():
                     if possible(y, x, n):
                         grid[y][x] = n
 
+                        times.append(t.return_time())
                         write_results(y, x, n)
                         update_grid(y, x, n)
 
@@ -137,6 +169,7 @@ def solve():
 
                         grid[y][x] = 0
 
+                        times.append(t.return_time())
                         write_results(y, x, 0)
 
                 return
@@ -144,7 +177,11 @@ def solve():
     print("Final version: ")
     print(np.matrix(grid))
     print("\n")
+
     t.stop()
+
+    plot_graph()
+
     input("More?")  # Checks if other answers are available
 
 
@@ -157,7 +194,10 @@ def main():
 
     read_matrix()
     check_file_exist()
+
     draw_grid()
+
+    t.start()
     solve()
 
     # Quit button
