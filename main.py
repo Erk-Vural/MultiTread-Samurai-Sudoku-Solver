@@ -3,32 +3,38 @@ from timer import Timer
 import os
 
 
+grid = []
+
+
 def check_file_exist():
     if os.path.exists("./examples/solved/9x9(solved).txt"):
         os.remove("./examples/solved/9x9(solved).txt")
 
 
 def write_results(y, x, n):
-    global f
     f = open("./examples/solved/9x9(solved).txt", "a")
     f.write(str(y + 1) + ", " + str(x + 1) + ", " + str(n))
     f.write("\n")
     f.close()
 
 
-grid = [[5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9],
-        ]
-print("Start Version: ")
-print(np.matrix(grid))
-print("\n")
+def read_matrix():
+    global grid
+
+    with open('./examples/sudoku/9x9.txt', 'r') as file:
+        while line := file.readline().rstrip().replace(' ', '').replace('*', '0'):
+            matrix_line = []
+
+            for point in line:
+                matrix_line.append(int(point))
+
+            grid.append(matrix_line)
+
+        print("Read Version: ")
+        print(np.matrix(grid))
+        print("\n")
+
+    file.close()
 
 
 # Checks row col and block to confirm "n" is available
@@ -90,5 +96,6 @@ def solve():
     input("More?")  # Checks if other answers are available
 
 
+read_matrix()
 check_file_exist()
 solve()
