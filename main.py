@@ -12,14 +12,30 @@ BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 WINDOW_HEIGHT = 540
 WINDOW_WIDTH = 540
+block_size = WINDOW_HEIGHT // 9  # Set the size of the grid block
+
+
+def set_text(x, y, n):
+    font = pygame.font.SysFont('arial', block_size)
+    text = font.render(n, True, (0, 0, 0))
+    SCREEN.blit(text, (x, y))
 
 
 def draw_grid():
-    block_size = WINDOW_HEIGHT // 9  # Set the size of the grid block
     for x in range(0, WINDOW_WIDTH, block_size):
         for y in range(0, WINDOW_HEIGHT, block_size):
             rect = pygame.Rect(x, y, block_size, block_size)
             pygame.draw.rect(SCREEN, BLACK, rect, 1)
+
+            '''Displays a number on that tile'''
+            value = str(grid[y // block_size][x // block_size])
+            set_text(x, y, value)
+
+    pygame.display.update()
+
+
+def update_grid():
+    pygame.display.update()
 
 
 # I/O
@@ -115,22 +131,23 @@ def solve():
 
 
 def main():
-    read_matrix()
-    check_file_exist()
-    solve()
-
+    # Create window
     global SCREEN
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     SCREEN.fill(WHITE)
 
+    read_matrix()
+    check_file_exist()
+    solve()
+
+    # Quit button
     while True:
         draw_grid()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
         pygame.display.update()
 
 
