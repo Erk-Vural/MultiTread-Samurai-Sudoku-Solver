@@ -47,7 +47,7 @@ def update_grid(y, x, n):
 
     clear_rect(x0, y0)
 
-    time.sleep(0.01)
+    # time.sleep(0.01)
 
     set_text(x0, y0, str(n))
     pygame.display.update()
@@ -131,20 +131,21 @@ def solve():
                         grid[y][x] = n
 
                         write_results(y, x, n)
-                        update_grid(y,x,n)
+                        update_grid(y, x, n)
 
                         solve()
+
                         grid[y][x] = 0
 
+                        write_results(y, x, 0)
 
                 return
 
     print("Final version: ")
     print(np.matrix(grid))
     print("\n")
-
     t.stop()
-    # input("More?")  # Checks if other answers are available
+    input("More?")  # Checks if other answers are available
 
 
 def main():
