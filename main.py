@@ -1,11 +1,28 @@
+import sys
 import numpy as np
-from timer import Timer
+import pygame as pygame
 import os
 
+from timer import Timer
 
 grid = []
 
+# GUI
+BLACK = (0, 0, 0)
+WHITE = (200, 200, 200)
+WINDOW_HEIGHT = 540
+WINDOW_WIDTH = 540
 
+
+def draw_grid():
+    block_size = WINDOW_HEIGHT // 9  # Set the size of the grid block
+    for x in range(0, WINDOW_WIDTH, block_size):
+        for y in range(0, WINDOW_HEIGHT, block_size):
+            rect = pygame.Rect(x, y, block_size, block_size)
+            pygame.draw.rect(SCREEN, BLACK, rect, 1)
+
+
+# I/O
 def check_file_exist():
     if os.path.exists("./examples/solved/9x9(solved).txt"):
         os.remove("./examples/solved/9x9(solved).txt")
@@ -37,6 +54,7 @@ def read_matrix():
     file.close()
 
 
+# Sudoku
 # Checks row col and block to confirm "n" is available
 def possible(y, x, n):
     global grid
@@ -93,9 +111,27 @@ def solve():
     print("\n")
 
     t.stop()
-    input("More?")  # Checks if other answers are available
+    # input("More?")  # Checks if other answers are available
 
 
-read_matrix()
-check_file_exist()
-solve()
+def main():
+    read_matrix()
+    check_file_exist()
+    solve()
+
+    global SCREEN
+    pygame.init()
+    SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    SCREEN.fill(WHITE)
+
+    while True:
+        draw_grid()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.update()
+
+
+main()
