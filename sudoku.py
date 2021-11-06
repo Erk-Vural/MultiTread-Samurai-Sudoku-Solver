@@ -108,7 +108,7 @@ def solve_sudoku():
 
                         times.append(t.get_current_time())
                         # save result to plot graph but save method is fouled, it should save each solved point
-                        results.append(y * x)
+                        results.append((y+1)*10 + (x+1))
 
                         save_sudoku_result(y, x, n, sudoku_type)
                         update_point(y, x, n)
@@ -117,10 +117,7 @@ def solve_sudoku():
 
                         grid[y][x] = 0
 
-                        times.append(t.get_current_time())
                         save_sudoku_result(y, x, 0, sudoku_type)
-                        # save result to plot graph but save method is fouled, it should save each solved point
-                        results.append(y * x)
 
                 return
 
