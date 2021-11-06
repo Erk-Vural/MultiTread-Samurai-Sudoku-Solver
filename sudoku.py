@@ -5,16 +5,6 @@ from file_functions import *
 from graphs import plot_sudoku_graph
 from timer import Timer
 
-
-sudoku_type = 1
-
-t = Timer()
-
-grid = []
-
-times = []
-results = []
-
 # GUI
 black = (0, 0, 0)
 light_gray = (230, 230, 230)
@@ -65,6 +55,17 @@ def update_point(y, x, n):
 
 # Sudoku
 # Checks row col and block to confirm "n" is available for selected point
+sudoku_type = 1
+is_solved = False
+
+t = Timer()
+
+grid = []
+
+times = []
+results = []
+
+
 def possible(y, x, n):
     global grid
     # Check col
@@ -96,6 +97,7 @@ def possible(y, x, n):
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
 def solve_sudoku():
+    global is_solved
     global grid
     global t
 
@@ -103,12 +105,12 @@ def solve_sudoku():
         for x in range(9):
             if grid[y][x] == 0:
                 for n in range(1, 10):
-                    if possible(y, x, n):
+                    if possible(y, x, n) and not is_solved:
                         grid[y][x] = n
 
                         times.append(t.get_current_time())
                         # save result to plot graph but save method is fouled, it should save each solved point
-                        results.append((y+1)*10 + (x+1))
+                        results.append((y + 1) * 10 + (x + 1))
 
                         save_sudoku_result(y, x, n, sudoku_type)
                         update_point(y, x, n)
@@ -125,13 +127,10 @@ def solve_sudoku():
     print(np.matrix(grid))
     print("\n")
 
+    is_solved = True
     t.stop()
 
     plot_sudoku_graph(times, results)
-
-    # After sudoku solved we need to break out of function this input pauses the program
-    # and should replace with a better solution
-    input("More?")  # Checks if other answers are available
 
 
 def main():
