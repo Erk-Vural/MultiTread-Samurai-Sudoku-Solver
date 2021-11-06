@@ -35,7 +35,7 @@ def draw_grid():
             rect = pygame.Rect(x, y, block_size, block_size)
             pygame.draw.rect(SCREEN, black, rect, 1)
 
-            value = str(grid[y // block_size][x // block_size])
+            value = str(puzzle[y // block_size][x // block_size])
             set_number(x, y, value)
 
     pygame.display.update()
@@ -60,28 +60,27 @@ is_solved = False
 
 t = Timer()
 
-grid = []
+puzzle = []
 
 times = []
 results = []
 
 
-def possible(y, x, n):
-    global grid
+def possible(y, x, n, puzzle):
     # Check col
     for i in range(0, 9):
-        if grid[y][i] == n:
+        if puzzle[y][i] == n:
             return False
     # Check row
     for i in range(0, 9):
-        if grid[i][x] == n:
+        if puzzle[i][x] == n:
             return False
     # Check block
     x0 = (x // 3) * 3
     y0 = (y // 3) * 3
     for i in range(0, 3):
         for j in range(0, 3):
-            if grid[y0 + i][x0 + j] == n:
+            if puzzle[y0 + i][x0 + j] == n:
                 return False
     # if number is not used before return true
     return True
@@ -96,17 +95,17 @@ def possible(y, x, n):
 # If a new suitable value founds a new solve called otherwise current solve return too
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
-def solve_sudoku():
+def solve_sudoku(puzzle):
     global is_solved
-    global grid
+
     global t
 
     for y in range(9):
         for x in range(9):
-            if grid[y][x] == 0:
+            if puzzle[y][x] == 0:
                 for n in range(1, 10):
-                    if possible(y, x, n) and not is_solved:
-                        grid[y][x] = n
+                    if possible(y, x, n, puzzle) and not is_solved:
+                        puzzle[y][x] = n
 
                         times.append(t.get_current_time())
                         # save result to plot graph but save method is fouled, it should save each solved point
@@ -115,16 +114,16 @@ def solve_sudoku():
                         save_sudoku_result(y, x, n, sudoku_type)
                         update_point(y, x, n)
 
-                        solve_sudoku()
+                        solve_sudoku(puzzle)
 
-                        grid[y][x] = 0
+                        puzzle[y][x] = 0
 
                         save_sudoku_result(y, x, 0, sudoku_type)
 
                 return
 
     print("Final version: ")
-    print(np.matrix(grid))
+    print(np.matrix(puzzle))
     print("\n")
 
     is_solved = True
@@ -134,7 +133,7 @@ def solve_sudoku():
 
 
 def main():
-    global grid
+    global puzzle
 
     # Create window
     global SCREEN
@@ -143,9 +142,9 @@ def main():
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     SCREEN.fill(light_gray)
 
-    grid = read_sudoku(sudoku_type)
+    puzzle = read_sudoku(sudoku_type)
     print("Read Version: ")
-    print(np.matrix(grid))
+    print(np.matrix(puzzle))
     print("\n")
 
     check_solution_files_exist(sudoku_type)
@@ -153,7 +152,7 @@ def main():
     draw_grid()
 
     t.start()
-    solve_sudoku()
+    solve_sudoku(puzzle)
 
     # Quit button
     while True:
