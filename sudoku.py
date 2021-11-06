@@ -66,21 +66,21 @@ times = []
 results = []
 
 
-def possible(y, x, n, puzzle):
+def possible(y, x, n, grid):
     # Check col
     for i in range(0, 9):
-        if puzzle[y][i] == n:
+        if grid[y][i] == n:
             return False
     # Check row
     for i in range(0, 9):
-        if puzzle[i][x] == n:
+        if grid[i][x] == n:
             return False
     # Check block
     x0 = (x // 3) * 3
     y0 = (y // 3) * 3
     for i in range(0, 3):
         for j in range(0, 3):
-            if puzzle[y0 + i][x0 + j] == n:
+            if grid[y0 + i][x0 + j] == n:
                 return False
     # if number is not used before return true
     return True
@@ -95,17 +95,17 @@ def possible(y, x, n, puzzle):
 # If a new suitable value founds a new solve called otherwise current solve return too
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
-def solve_sudoku(puzzle):
+def solve(grid):
     global is_solved
 
     global t
 
     for y in range(9):
         for x in range(9):
-            if puzzle[y][x] == 0:
+            if grid[y][x] == 0:
                 for n in range(1, 10):
-                    if possible(y, x, n, puzzle) and not is_solved:
-                        puzzle[y][x] = n
+                    if possible(y, x, n, grid) and not is_solved:
+                        grid[y][x] = n
 
                         times.append(t.get_current_time())
                         # save result to plot graph but save method is fouled, it should save each solved point
@@ -114,16 +114,16 @@ def solve_sudoku(puzzle):
                         save_sudoku_result(y, x, n, sudoku_type)
                         update_point(y, x, n)
 
-                        solve_sudoku(puzzle)
+                        solve(grid)
 
-                        puzzle[y][x] = 0
+                        grid[y][x] = 0
 
                         save_sudoku_result(y, x, 0, sudoku_type)
 
                 return
 
     print("Final version: ")
-    print(np.matrix(puzzle))
+    print(np.matrix(grid))
     print("\n")
 
     is_solved = True
@@ -152,7 +152,7 @@ def main():
     draw_grid()
 
     t.start()
-    solve_sudoku(puzzle)
+    solve(puzzle)
 
     # Quit button
     while True:
