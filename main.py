@@ -7,6 +7,7 @@ import sys
 
 import time
 
+from file_functions import *
 from graphs import plot_sudoku_graph
 from timer import Timer
 
@@ -65,42 +66,6 @@ def update_point(y, x, n):
     pygame.display.update()
 
 
-# I/O
-def check_file_exist():
-    if os.path.exists("./examples/solved/9x9(result).txt"):
-        os.remove("./examples/solved/9x9(result).txt")
-
-
-def save_result(y, x, n):
-    global results
-
-    # save result to plot graph but save method is fouled, it should save each solved point
-    results.append(y * x)
-
-    f = open("./examples/solved/9x9(result).txt", "a")
-    f.write("y: " + str(y + 1) + ", " + "x: " + str(x + 1) + ", " + "Value: " + str(n))
-    f.write("\n")
-    f.close()
-
-
-def read_sudoku():
-    global grid
-
-    with open('./examples/sudoku/9x9.txt', 'r') as file:
-        while line := file.readline().rstrip().replace(' ', '').replace('*', '0'):
-            matrix_line = []
-
-            for point in line:
-                matrix_line.append(int(point))
-
-            grid.append(matrix_line)
-
-        print("Read Version: ")
-        print(np.matrix(grid))
-        print("\n")
-
-    file.close()
-
 
 # Sudoku
 # Checks row col and block to confirm "n" is available for selected point
@@ -146,7 +111,10 @@ def solve_sudoku():
                         grid[y][x] = n
 
                         times.append(t.get_current_time())
-                        save_result(y, x, n)
+                        # save result to plot graph but save method is fouled, it should save each solved point
+                        results.append(y * x)
+
+                        save_sudoku_result(y, x, n)
                         update_point(y, x, n)
 
                         solve_sudoku()
@@ -154,7 +122,9 @@ def solve_sudoku():
                         grid[y][x] = 0
 
                         times.append(t.get_current_time())
-                        save_result(y, x, 0)
+                        save_sudoku_result(y, x, 0)
+                        # save result to plot graph but save method is fouled, it should save each solved point
+                        results.append(y * x)
 
                 return
 
@@ -172,14 +142,17 @@ def solve_sudoku():
 
 
 def main():
+    global grid
+
     # Create window
     global SCREEN
+
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     SCREEN.fill(light_gray)
 
-    read_sudoku()
-    check_file_exist()
+    grid = read_sudoku()
+    check_solution_files_exist()
 
     draw_grid()
 
