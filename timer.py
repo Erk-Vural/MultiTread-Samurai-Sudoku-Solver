@@ -36,7 +36,7 @@ class Timer:
 
         print(f"Elapsed time: {elapsed_time:0.3f} seconds")
 
-    def return_time(self):
+    def get_current_time(self):
         if self._start_time is None:
             raise TimerError(f"Timer is not running. Use .start() to start it")
 

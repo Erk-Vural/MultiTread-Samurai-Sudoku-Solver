@@ -12,21 +12,21 @@ from timer import Timer
 
 t = Timer()
 
-times = []
-results = []
-
 grid = []
 
 # GUI
-BLACK = (0, 0, 0)
-WHITE = (200, 200, 200)
-WINDOW_HEIGHT = 540
-WINDOW_WIDTH = 540
-block_size = WINDOW_HEIGHT // 9  # Set the size of the grid block
+black = (0, 0, 0)
+light_gray = (230, 230, 230)
+
+block_amount = 9
+block_size = 60
+
+WINDOW_HEIGHT = block_size * block_amount
+WINDOW_WIDTH = block_size * block_amount
 
 
-def set_text(x, y, n):
-    # Displays a number on that tile
+def set_number(x, y, n):
+    # Displays a number on point
     font = pygame.font.SysFont('arial', block_size)
     text = font.render(n, True, (0, 0, 0))
     SCREEN.blit(text, (x, y))
@@ -34,23 +34,23 @@ def set_text(x, y, n):
 
 def clear_rect(x, y):
     rect = pygame.Rect(x, y, block_size, block_size)
-    SCREEN.fill(WHITE, rect)
-    pygame.draw.rect(SCREEN, BLACK, rect, 1)
+    SCREEN.fill(light_gray, rect)
+    pygame.draw.rect(SCREEN, black, rect, 1)
 
 
 def draw_grid():
     for x in range(0, WINDOW_WIDTH, block_size):
         for y in range(0, WINDOW_HEIGHT, block_size):
             rect = pygame.Rect(x, y, block_size, block_size)
-            pygame.draw.rect(SCREEN, BLACK, rect, 1)
+            pygame.draw.rect(SCREEN, black, rect, 1)
 
             value = str(grid[y // block_size][x // block_size])
-            set_text(x, y, value)
+            set_number(x, y, value)
 
     pygame.display.update()
 
 
-def update_grid(y, x, n):
+def update_point(y, x, n):
     x0 = x * block_size
     y0 = y * block_size
 
@@ -58,12 +58,17 @@ def update_grid(y, x, n):
 
     # time.sleep(0.01)
 
-    set_text(x0, y0, str(n))
+    set_number(x0, y0, str(n))
     pygame.display.update()
 
 
 # Graph
-def plot_graph():
+# Currently we use all calculation vs all time but it should be point solved vs time
+times = []
+results = []
+
+
+def plot_sudoku_graph():
     # x - time
     times.sort()
     x = times
@@ -89,17 +94,19 @@ def check_file_exist():
         os.remove("./examples/solved/9x9(result).txt")
 
 
-def write_results(y, x, n):
+def save_result(y, x, n):
     global results
+
+    # save result to plot graph but save method is fouled, it should save each solved point
     results.append(y * x)
 
     f = open("./examples/solved/9x9(result).txt", "a")
-    f.write(str(y + 1) + ", " + str(x + 1) + ", " + str(n))
+    f.write("y: " + str(y + 1) + ", " + "x: " + str(x + 1) + ", " + "Value: " + str(n))
     f.write("\n")
     f.close()
 
 
-def read_matrix():
+def read_sudoku():
     global grid
 
     with open('./examples/sudoku/9x9.txt', 'r') as file:
@@ -119,7 +126,7 @@ def read_matrix():
 
 
 # Sudoku
-# Checks row col and block to confirm "n" is available
+# Checks row col and block to confirm "n" is available for selected point
 def possible(y, x, n):
     global grid
     # Check col
@@ -150,7 +157,7 @@ def possible(y, x, n):
 # If a new suitable value founds a new solve called otherwise current solve return too
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
-def solve():
+def solve_sudoku():
     global grid
     global t
 
@@ -161,16 +168,16 @@ def solve():
                     if possible(y, x, n):
                         grid[y][x] = n
 
-                        times.append(t.return_time())
-                        write_results(y, x, n)
-                        update_grid(y, x, n)
+                        times.append(t.get_current_time())
+                        save_result(y, x, n)
+                        update_point(y, x, n)
 
-                        solve()
+                        solve_sudoku()
 
                         grid[y][x] = 0
 
-                        times.append(t.return_time())
-                        write_results(y, x, 0)
+                        times.append(t.get_current_time())
+                        save_result(y, x, 0)
 
                 return
 
@@ -180,8 +187,10 @@ def solve():
 
     t.stop()
 
-    plot_graph()
+    plot_sudoku_graph()
 
+    # After sudoku solved we need to break out of function this input pauses the program
+    # and should replace with a better solution
     input("More?")  # Checks if other answers are available
 
 
@@ -190,15 +199,15 @@ def main():
     global SCREEN
     pygame.init()
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    SCREEN.fill(WHITE)
+    SCREEN.fill(light_gray)
 
-    read_matrix()
+    read_sudoku()
     check_file_exist()
 
     draw_grid()
 
     t.start()
-    solve()
+    solve_sudoku()
 
     # Quit button
     while True:
@@ -208,4 +217,5 @@ def main():
                 sys.exit()
 
 
-main()
+if __name__ == "__main__":
+    main()
