@@ -1,6 +1,5 @@
 import pygame as pygame
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 import os
@@ -8,11 +7,15 @@ import sys
 
 import time
 
+from graphs import plot_sudoku_graph
 from timer import Timer
 
 t = Timer()
 
 grid = []
+
+times = []
+results = []
 
 # GUI
 black = (0, 0, 0)
@@ -60,32 +63,6 @@ def update_point(y, x, n):
 
     set_number(x0, y0, str(n))
     pygame.display.update()
-
-
-# Graph
-# Currently we use all calculation vs all time but it should be point solved vs time
-times = []
-results = []
-
-
-def plot_sudoku_graph():
-    # x - time
-    times.sort()
-    x = times
-    # y - Square Found
-
-    results.sort()
-    y = results
-
-    plt.plot(x, y)
-
-    plt.xticks(times[::800])
-
-    plt.xlabel('x - time')
-    plt.ylabel('y - Square Found')
-    plt.title('9x9 Sudoku Time-Found Graph')
-
-    plt.show()
 
 
 # I/O
@@ -187,7 +164,7 @@ def solve_sudoku():
 
     t.stop()
 
-    plot_sudoku_graph()
+    plot_sudoku_graph(times, results)
 
     # After sudoku solved we need to break out of function this input pauses the program
     # and should replace with a better solution
