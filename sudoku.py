@@ -144,6 +144,10 @@ def main():
     SCREEN.fill(light_gray)
 
     grid = read_sudoku(sudoku_type)
+    print("Read Version: ")
+    print(np.matrix(grid))
+    print("\n")
+
     check_solution_files_exist(sudoku_type)
 
     draw_grid()
