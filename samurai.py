@@ -81,6 +81,41 @@ def convert_to_pieces():
         print("\n")
 
 
+def check(x, y, n, grid, piece_id):
+    add_to_x = 0
+    add_to_y = 0
+
+    # Solve middle with other corners in mind
+    if piece_id == 2:
+        # left
+        if 0 <= x < 3:
+            # top_left
+            if 0 <= y < 3:
+                add_to_x = 6
+                add_to_y = 6
+            # bottom_left
+            if 6 <= y < 9:
+                add_to_x = 6
+                add_to_y = -6
+        # right
+        if 6 <= x < 9:
+            # top_right
+            if 0 <= y < 3:
+                add_to_x = -6
+                add_to_y = 6
+            # bottom_right
+            if 6 <= y < 9:
+                add_to_x = -6
+                add_to_y = -6
+
+        return possible(y, x, n, grid) \
+               and possible(y + add_to_y, x + add_to_x, n, puzzles[piece_id]) \
+               and not is_solved
+    # Other puzzles
+    else:
+        return possible(y, x, n, grid) and not is_solved
+
+
 def solve(piece_id):
     global is_solved
     global t
@@ -92,7 +127,7 @@ def solve(piece_id):
         for x in range(9):
             if grid[y][x] == 0:
                 for n in range(1, 10):
-                    if possible(y, x, n, grid) and not is_solved:
+                    if check(x, y, n, grid, piece_id):
                         grid[y][x] = n
 
                         solve(piece_id)
@@ -119,6 +154,11 @@ def solve(piece_id):
 def solve_samurai():
     global is_solved
 
+    solve(2)
+    is_solved = False
+
+    update_puzzles()
+
     for i in range(5):
         if i == 2:
             continue
@@ -126,34 +166,33 @@ def solve_samurai():
         solve(i)
         is_solved = False
 
-    update_middle()
-    solve(2)
 
-
-def update_middle():
+def update_puzzles():
     global puzzles
 
     for i in range(5):
+        if i == 2:
+            continue
         if i == 0:
-            for y in range(6, 9):
-                for x in range(6, 9):
-                    puzzles[2][y - 6][x - 6] = solved_puzzles[i][y][x]
+            for y in range(3):
+                for x in range(3):
+                    puzzles[i][y + 6][x + 6] = solved_puzzles[2][y][x]
         if i == 1:
-            for y in range(6, 9):
-                for x in range(3):
-                    puzzles[2][y - 6][x + 6] = solved_puzzles[i][y][x]
-        if i == 3:
             for y in range(3):
                 for x in range(6, 9):
-                    puzzles[2][y + 6][x - 6] = solved_puzzles[i][y][x]
-        if i == 4:
-            for y in range(3):
+                    puzzles[i][y + 6][x - 6] = solved_puzzles[2][y][x]
+        if i == 3:
+            for y in range(6, 9):
                 for x in range(3):
-                    puzzles[2][y + 6][x + 6] = solved_puzzles[i][y][x]
+                    puzzles[i][y - 6][x + 6] = solved_puzzles[2][y][x]
+        if i == 4:
+            for y in range(6, 9):
+                for x in range(6, 9):
+                    puzzles[i][y - 6][x - 6] = solved_puzzles[2][y][x]
 
-    print("Updated version of: " + str(2))
-    print(np.matrix(puzzles[2]))
-    print("\n")
+        print("Updated version of: " + str(i))
+        print(np.matrix(puzzles[i]))
+        print("\n")
 
 
 def main():
