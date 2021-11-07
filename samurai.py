@@ -21,6 +21,7 @@ puzzles = [[], [], [], [], []]
 solved_puzzles = [[], [], [], [], []]
 
 
+# Convert puzzle lists to puzzle matrices
 def list_to_matrix(puzzle_list):
     puzzle_matrix = []
     matrix_line = []
@@ -34,6 +35,7 @@ def list_to_matrix(puzzle_list):
     return puzzle_matrix
 
 
+# Separates puzzles to different lists
 def convert_to_pieces():
     global puzzles
 
@@ -81,6 +83,8 @@ def convert_to_pieces():
         print("\n")
 
 
+# Checks if value is suitable for point if point is at one of the conflicted block checks
+# both puzzles
 def check(y, x, n, grid, piece_id):
     add_to_x = 0
     add_to_y = 0
@@ -152,7 +156,7 @@ def solve(piece_id):
     is_solved = True
 
 
-# Solve samurai without threads
+# Solve samurai without threads starting from middle puzzle
 def solve_samurai():
     global is_solved
 
@@ -169,6 +173,7 @@ def solve_samurai():
         is_solved = False
 
 
+# After middle is solved function updates all puzzles
 def update_puzzles():
     global puzzles
 
