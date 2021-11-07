@@ -81,9 +81,10 @@ def convert_to_pieces():
         print("\n")
 
 
-def check(x, y, n, grid, piece_id):
+def check(y, x, n, grid, piece_id):
     add_to_x = 0
     add_to_y = 0
+    check_piece_id = piece_id
 
     # Solve middle with other corners in mind
     if piece_id == 2:
@@ -93,27 +94,28 @@ def check(x, y, n, grid, piece_id):
             if 0 <= y < 3:
                 add_to_x = 6
                 add_to_y = 6
+                check_piece_id = 0
             # bottom_left
             if 6 <= y < 9:
                 add_to_x = 6
                 add_to_y = -6
+                check_piece_id = 3
         # right
         if 6 <= x < 9:
             # top_right
             if 0 <= y < 3:
                 add_to_x = -6
                 add_to_y = 6
+                check_piece_id = 1
             # bottom_right
             if 6 <= y < 9:
                 add_to_x = -6
                 add_to_y = -6
+                check_piece_id = 4
 
-        return possible(y, x, n, grid) \
-               and possible(y + add_to_y, x + add_to_x, n, puzzles[piece_id]) \
-               and not is_solved
-    # Other puzzles
-    else:
-        return possible(y, x, n, grid) and not is_solved
+    return possible(y, x, n, grid) \
+           and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
+           and not is_solved
 
 
 def solve(piece_id):
@@ -127,7 +129,7 @@ def solve(piece_id):
         for x in range(9):
             if grid[y][x] == 0:
                 for n in range(1, 10):
-                    if check(x, y, n, grid, piece_id):
+                    if check(y, x, n, grid, piece_id):
                         grid[y][x] = n
 
                         solve(piece_id)
