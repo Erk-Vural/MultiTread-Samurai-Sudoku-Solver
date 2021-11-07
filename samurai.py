@@ -18,6 +18,7 @@ t = Timer()
 # puzzle[4] is bottom_right
 samurai_grid = []
 puzzles = [[], [], [], [], []]
+solved_puzzles = [[], [], [], [], []]
 
 
 def list_to_matrix(puzzle_list):
@@ -80,10 +81,12 @@ def convert_to_pieces():
         print("\n")
 
 
-def solve(grid):
+def solve(piece_id):
     global is_solved
-
     global t
+    global solved_puzzles
+
+    grid = puzzles[piece_id]
 
     for y in range(9):
         for x in range(9):
@@ -92,22 +95,69 @@ def solve(grid):
                     if possible(y, x, n, grid) and not is_solved:
                         grid[y][x] = n
 
-                        solve(grid)
+                        solve(piece_id)
 
                         grid[y][x] = 0
 
                 return
 
-    print("Final version: ")
-    print(np.matrix(grid))
+    for y in range(9):
+        matrix_line = []
+        for x in range(9):
+            matrix_line.append(grid[y][x])
+        solved_puzzles[piece_id].append(matrix_line)
+        matrix_line = []
+
+    print("Final version of: " + str(piece_id))
+    print(np.matrix(solved_puzzles[piece_id]))
     print("\n")
 
     is_solved = True
 
 
+# Solve samurai without threads
+def solve_samurai():
+    global is_solved
+
+    for i in range(5):
+        if i == 2:
+            continue
+
+        solve(i)
+        is_solved = False
+
+    update_middle()
+    solve(2)
+
+
+def update_middle():
+    global puzzles
+
+    for i in range(5):
+        if i == 0:
+            for y in range(6, 9):
+                for x in range(6, 9):
+                    puzzles[2][y - 6][x - 6] = solved_puzzles[i][y][x]
+        if i == 1:
+            for y in range(6, 9):
+                for x in range(3):
+                    puzzles[2][y - 6][x + 6] = solved_puzzles[i][y][x]
+        if i == 3:
+            for y in range(3):
+                for x in range(6, 9):
+                    puzzles[2][y + 6][x - 6] = solved_puzzles[i][y][x]
+        if i == 4:
+            for y in range(3):
+                for x in range(3):
+                    puzzles[2][y + 6][x + 6] = solved_puzzles[i][y][x]
+
+    print("Updated version of: " + str(2))
+    print(np.matrix(puzzles[2]))
+    print("\n")
+
+
 def main():
     global samurai_grid
-    global is_solved
 
     samurai_grid = read_sudoku(sudoku_type)
     print("Read Version: ")
@@ -118,9 +168,7 @@ def main():
 
     convert_to_pieces()
 
-    for i in range(5):
-        solve(puzzles[i])
-        is_solved = False
+    solve_samurai()
 
 
 if __name__ == "__main__":
