@@ -1,4 +1,6 @@
 import numpy as np
+import threading
+import time
 
 from file_functions import read_sudoku, check_solution_files_exist
 from sudoku import possible
@@ -6,7 +8,8 @@ from timer import Timer
 
 # Samurai
 sudoku_type = 2
-is_solved = False
+are_blocks_solved = [[0, False], [1, False], [2, False], [3, False], [4, False]]
+are_puzzles_solved = [[0, False], [1, False], [2, False], [3, False], [4, False]]
 
 t = Timer()
 
@@ -119,28 +122,71 @@ def check(y, x, n, grid, piece_id):
 
     return possible(y, x, n, grid) \
            and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
-           and not is_solved
+           and not are_puzzles_solved[piece_id][1]
 
 
-def solve(piece_id):
-    global is_solved
+def check_block(y, x, grid):
+    global are_blocks_solved
+
+    if y == 3 and not are_blocks_solved[0][1]:
+        print("1. part is_solved in puzzle 2\n")
+
+        are_blocks_solved[0][1] = True
+        update_puzzles(0, grid)
+        are_blocks_solved[1][1] = True
+        update_puzzles(1, grid)
+    if y == 8 and x == 8 and not are_blocks_solved[3][1]:
+        print("2. part is_solved in puzzle 2\n")
+
+        are_blocks_solved[3][1] = True
+        update_puzzles(3, grid)
+        are_blocks_solved[4][1] = True
+        update_puzzles(4, grid)
+
+
+def solve_5_tread(piece_id):
+    global are_blocks_solved
     global t
     global solved_puzzles
 
-    grid = puzzles[piece_id]
+    if piece_id == 2:
+        grid = puzzles[piece_id]
 
-    for y in range(9):
-        for x in range(9):
-            if grid[y][x] == 0:
-                for n in range(1, 10):
-                    if check(y, x, n, grid, piece_id):
-                        grid[y][x] = n
+        for y in range(9):
+            for x in range(9):
+                if grid[y][x] == 0:
+                    for n in range(1, 10):
+                        if check(y, x, n, grid, piece_id):
+                            grid[y][x] = n
 
-                        solve(piece_id)
+                            check_block(y, x, grid)
 
-                        grid[y][x] = 0
+                            solve_5_tread(piece_id)
 
-                return
+                            grid[y][x] = 0
+
+                    return
+
+    else:
+        while not are_blocks_solved[piece_id][1]:
+            pass
+        if are_blocks_solved[piece_id][1]:
+            grid = puzzles[piece_id]
+
+            for y in range(9):
+                for x in range(9):
+                    if grid[y][x] == 0:
+                        for n in range(1, 10):
+                            if check(y, x, n, grid, piece_id):
+                                check_block(y, x, grid)
+
+                                grid[y][x] = n
+
+                                solve_5_tread(piece_id)
+
+                                grid[y][x] = 0
+
+                        return
 
     for y in range(9):
         matrix_line = []
@@ -153,22 +199,7 @@ def solve(piece_id):
     print(np.matrix(solved_puzzles[piece_id]))
     print("\n")
 
-    is_solved = True
-
-
-# Solve samurai without threads starting from middle puzzle
-def solve_samurai():
-    global is_solved
-
-    solve(2)
-    is_solved = False
-
-    for i in range(5):
-        if i == 2:
-            continue
-        update_puzzles(i, solved_puzzles[2])
-        solve(i)
-        is_solved = False
+    are_puzzles_solved[piece_id][1] = True
 
 
 # After middle is solved function updates all puzzles
@@ -197,6 +228,19 @@ def update_puzzles(piece_id, grid):
     print("\n")
 
 
+# Solve samurai without threads starting from middle puzzle
+def solve_samurai_tread():
+    threads = []
+
+    for i in range(5):
+        trd = threading.Thread(target=solve_5_tread, args=[i])
+        trd.start()
+        threads.append(trd)
+
+    for thread in threads:
+        thread.join()
+
+
 def main():
     global samurai_grid
 
@@ -209,7 +253,7 @@ def main():
 
     convert_to_pieces()
 
-    solve_samurai()
+    solve_samurai_tread()
 
 
 if __name__ == "__main__":
