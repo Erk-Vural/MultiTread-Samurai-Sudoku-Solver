@@ -163,43 +163,43 @@ def solve_samurai():
     solve(2)
     is_solved = False
 
-    update_puzzles()
-
     for i in range(5):
         if i == 2:
             continue
-
+        update_puzzles(i)
         solve(i)
         is_solved = False
 
 
 # After middle is solved function updates all puzzles
-def update_puzzles():
+def update_puzzles(piece_id):
     global puzzles
 
-    for i in range(5):
-        if i == 2:
-            continue
-        if i == 0:
-            for y in range(3):
-                for x in range(3):
-                    puzzles[i][y + 6][x + 6] = solved_puzzles[2][y][x]
-        if i == 1:
-            for y in range(3):
-                for x in range(6, 9):
-                    puzzles[i][y + 6][x - 6] = solved_puzzles[2][y][x]
-        if i == 3:
-            for y in range(6, 9):
-                for x in range(3):
-                    puzzles[i][y - 6][x + 6] = solved_puzzles[2][y][x]
-        if i == 4:
-            for y in range(6, 9):
-                for x in range(6, 9):
-                    puzzles[i][y - 6][x - 6] = solved_puzzles[2][y][x]
+    if piece_id == 0:
+        for y in range(3):
+            for x in range(3):
+                puzzles[piece_id][y + 6][x + 6] = solved_puzzles[2][y][x]
+    if piece_id == 1:
+        for y in range(3):
+            for x in range(6, 9):
+                puzzles[piece_id][y + 6][x - 6] = solved_puzzles[2][y][x]
+    if piece_id == 3:
+        for y in range(6, 9):
+            for x in range(3):
+                puzzles[piece_id][y - 6][x + 6] = solved_puzzles[2][y][x]
+    if piece_id == 4:
+        for y in range(6, 9):
+            for x in range(6, 9):
+                puzzles[piece_id][y - 6][x - 6] = solved_puzzles[2][y][x]
 
-        print("Updated version of: " + str(i))
-        print(np.matrix(puzzles[i]))
-        print("\n")
+    print("Updated version of: " + str(piece_id))
+    print(np.matrix(puzzles[piece_id]))
+    print("\n")
+
+
+# Solve samurai with 5 tread 1 starting point
+def solve_samurai_five_tread():
+    pass
 
 
 def main():
