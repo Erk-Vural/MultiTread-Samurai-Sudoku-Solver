@@ -9,6 +9,7 @@ from timer import Timer
 # GUI
 black = (0, 0, 0)
 light_gray = (230, 230, 230)
+gray = (250, 250, 250)
 
 block_amount = 9
 block_size = 60
@@ -24,6 +25,7 @@ def draw_grid(grid):
                 continue
 
             rect = pygame.Rect(x, y, block_size, block_size)
+            SCREEN.fill(gray, rect)
             pygame.draw.rect(SCREEN, black, rect, 2)
 
             value = str(grid[y // block_size][x // block_size])
@@ -46,9 +48,9 @@ def update_point(y, x, n):
 
 def set_number(x, y, n):
     # Displays a number on point
-    font = pygame.font.SysFont('arial', block_size)
+    font = pygame.font.SysFont('arial',  int(block_size * 0.75))
     text = font.render(n, True, (0, 0, 0))
-    SCREEN.blit(text, (x, y))
+    SCREEN.blit(text, (x + 15, y + 5))
 
 
 def clear_rect(x, y):
