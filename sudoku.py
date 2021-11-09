@@ -56,7 +56,7 @@ def update_point(y, x, n):
 # Sudoku
 # Checks row col and block to confirm "n" is available for selected point
 sudoku_type = 1
-is_solved = False
+is_puzzle_solved = False
 
 t = Timer()
 
@@ -96,7 +96,7 @@ def possible(y, x, n, grid):
 # and previous point is reassigned.
 # Function works until all grid is solved.then prints solved grid
 def solve(grid):
-    global is_solved
+    global is_puzzle_solved
 
     global t
 

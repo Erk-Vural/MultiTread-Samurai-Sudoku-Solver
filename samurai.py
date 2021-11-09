@@ -8,7 +8,7 @@ from timer import Timer
 
 # Samurai
 sudoku_type = 2
-is_solved = [False, False, False, False, False]
+is_puzzle_solved = [False, False, False, False, False]
 
 t = Timer()
 
@@ -121,11 +121,11 @@ def check(y, x, n, grid, piece_id):
 
     return possible(y, x, n, grid) \
            and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
-           and not is_solved[piece_id]
+           and not is_puzzle_solved[piece_id]
 
 
 def solve(piece_id):
-    global is_solved
+    global is_puzzle_solved
     global t
     global solved_puzzles
 
@@ -155,7 +155,7 @@ def solve(piece_id):
     print(np.matrix(solved_puzzles[piece_id]))
     print("\n")
 
-    is_solved[piece_id] = True
+    is_puzzle_solved[piece_id] = True
 
 
 # After middle is solved function updates all puzzles
@@ -215,9 +215,9 @@ def manage_five_treads(piece_id):
     if piece_id == 2:
         solve(2)
     else:
-        while not is_solved[2]:
+        while not is_puzzle_solved[2]:
             print(str(piece_id) + "is waiting\n")
-        if is_solved[2]:
+        if is_puzzle_solved[2]:
             update_puzzles(piece_id, solved_puzzles[2])
             solve(piece_id)
 

@@ -2,11 +2,11 @@ import concurrent.futures
 import threading
 import time
 
-is_solved = False
+is_puzzle_solved = False
 
 
 def do_something(piece_id):
-    global is_solved
+    global is_puzzle_solved
 
     print(str(piece_id) + " is started\n")
     if piece_id == 2:
