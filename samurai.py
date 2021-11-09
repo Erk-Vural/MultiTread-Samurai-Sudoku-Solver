@@ -1,14 +1,16 @@
 import numpy as np
 import threading
 
-from io_functions import read_sudoku, check_solution_files_exist
+from io_functions import read_sudoku, check_solution_files_exist, save_samurai_result
 from timer import Timer
 
 # Samurai
-# Solves samurai sudoku without treads, with 5 treads and 10 treads 10 tread version has 2 thread on same puzzle and
+# Solves samurai examples without treads, with 5 treads and 10 treads 10 tread version has 2 thread on same puzzle and
 # starts from 2 different points
 
-sudoku_type = 2
+samurai_example_file_name = "examples/samurai.txt"
+samurai_solved_file_name = "solved/samurai(result).txt"
+
 is_puzzle_solved = [False, False, False, False, False]
 
 t = Timer()
@@ -171,7 +173,7 @@ def update_puzzles(piece_id, starting_point, grid):
     print("\n")
 
 
-# Using recursion to solve sudoku.
+# Using recursion to solve examples.
 # Function search for an empty point then tries all values between (1,9), if suitable
 # value found, it replaces point with value and calls a new solve. If a solve returns
 # it means that there is no suitable value for the point, therefore previous point
@@ -185,6 +187,8 @@ def solve(piece_id, starting_point):
     global t
     global solved_puzzles
 
+    grid = puzzles[piece_id]
+
     head_point = 0
     end_point = 9
     operation = 1
@@ -195,8 +199,6 @@ def solve(piece_id, starting_point):
         end_point = -1
         operation = -1
 
-    grid = puzzles[piece_id]
-
     for y in range(head_point, end_point, operation):
         for x in range(head_point, end_point, operation):
             if grid[y][x] == 0:
@@ -204,9 +206,13 @@ def solve(piece_id, starting_point):
                     if check(y, x, n, grid, piece_id):
                         grid[y][x] = n
 
+                        save_samurai_result(y, x, n, piece_id, starting_point, samurai_solved_file_name)
+
                         solve(piece_id, starting_point)
 
                         grid[y][x] = 0
+
+                        save_samurai_result(y, x, 0, piece_id, starting_point, samurai_solved_file_name)
 
                 return
 
@@ -267,13 +273,18 @@ def manage_treads(piece_id, starting_point):
 
 def main():
     global samurai_grid
+    global samurai_example_file_name
+    global samurai_solved_file_name
 
-    samurai_grid = read_sudoku(sudoku_type)
+    samurai_example_file_name = "examples/samurai.txt"
+    samurai_solved_file_name = "solved/samurai(result).txt"
+
+    samurai_grid = read_sudoku(samurai_example_file_name)
     print("Read Version: ")
     print(samurai_grid)
     print("\n")
 
-    check_solution_files_exist(sudoku_type)
+    check_solution_files_exist(samurai_solved_file_name)
 
     convert_to_pieces()
 
@@ -282,8 +293,8 @@ def main():
 
     t.start()
 
-    # solve_samurai()
-    solve_samurai_tread(tread_type1)
+    solve_samurai()
+    # solve_samurai_tread(tread_type1)
 
     t.stop()
 

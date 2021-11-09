@@ -1,3 +1,4 @@
+import numpy as np
 import pygame as pygame
 import sys
 
@@ -56,7 +57,9 @@ def update_point(y, x, n):
 
 # Sudoku
 # Checks row col and block to confirm "n" is available for selected point
-sudoku_type = 1
+sudoku_example_file_name = "examples/9x9.txt"
+sudoku_solved_file_name = "solved/9x9(result).txt"
+
 is_puzzle_solved = False
 
 t = Timer()
@@ -67,7 +70,7 @@ times = []
 results = []
 
 
-# Using recursion to solve sudoku.
+# Using recursion to solve examples.
 # Function search for an empty point then tries all values between (1,9), if suitable
 # value found, it replaces point with value and calls a new solve. If a solve returns
 # it means that there is no suitable value for the point, therefore previous point
@@ -92,14 +95,15 @@ def solve(grid):
                         # save result to plot graph but save method is fouled, it should save each solved point
                         results.append((y + 1) * 10 + (x + 1))
 
-                        save_sudoku_result(y, x, n, sudoku_type)
+                        save_sudoku_result(y, x, n, sudoku_solved_file_name)
+
                         update_point(y, x, n)
 
                         solve(grid)
 
                         grid[y][x] = 0
 
-                        save_sudoku_result(y, x, 0, sudoku_type)
+                        save_sudoku_result(y, x, 0, sudoku_solved_file_name)
 
                 return
 
@@ -107,13 +111,18 @@ def solve(grid):
     print(np.matrix(grid))
     print("\n")
 
-    is_solved = True
+    is_puzzle_solved = True
 
     plot_sudoku_graph(times, results)
 
 
 def main():
     global puzzle
+    global sudoku_example_file_name
+    global sudoku_solved_file_name
+
+    sudoku_example_file_name = "examples/9x9.txt"
+    sudoku_solved_file_name = "solved/9x9(result).txt"
 
     # Create window
     global SCREEN
@@ -122,13 +131,13 @@ def main():
     SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     SCREEN.fill(light_gray)
 
-    puzzle = read_sudoku(sudoku_type)
+    puzzle = read_sudoku(sudoku_example_file_name)
 
     print("Read Version: ")
     print(np.matrix(puzzle))
     print("\n")
 
-    check_solution_files_exist(sudoku_type)
+    check_solution_files_exist(sudoku_solved_file_name)
 
     draw_grid()
 

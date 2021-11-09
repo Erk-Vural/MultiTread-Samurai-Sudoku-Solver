@@ -1,40 +1,8 @@
 # I/O
 import os
 
-import numpy as np
 
-
-def check_solution_files_exist(sudoku_type):
-    file_name = ""
-    if sudoku_type == 1:
-        file_name = "./examples/solved/9x9(result).txt"
-    if sudoku_type == 2:
-        file_name = "./examples/solved/samurai(result).txt"
-
-    if os.path.exists(file_name):
-        os.remove(file_name)
-
-
-def save_sudoku_result(y, x, n, sudoku_type):
-    file_name = ""
-    if sudoku_type == 1:
-        file_name = "./examples/solved/9x9(result).txt"
-    if sudoku_type == 2:
-        file_name = "./examples/solved/samurai(result).txt"
-
-    f = open("./examples/solved/9x9(result).txt", "a")
-    f.write("y: " + str(y + 1) + ", " + "x: " + str(x + 1) + ", " + "Value: " + str(n))
-    f.write("\n")
-    f.close()
-
-
-def read_sudoku(sudoku_type):
-    file_name = ""
-    if sudoku_type == 1:
-        file_name = './examples/sudoku/9x9.txt'
-    if sudoku_type == 2:
-        file_name = './examples/sudoku/samurai.txt'
-
+def read_sudoku(file_name):
     grid = []
 
     with open(file_name, 'r') as file:
@@ -48,3 +16,23 @@ def read_sudoku(sudoku_type):
 
     file.close()
     return grid
+
+
+def check_solution_files_exist(file_name):
+    if os.path.exists(file_name):
+        os.remove(file_name)
+
+
+def save_sudoku_result(y, x, n, file_name):
+    f = open(file_name, "a")
+    result = "y: " + str(y + 1) + ", " + "x: " + str(x + 1) + ", " + "Value: " + str(n) + "\n"
+    f.write(result)
+    f.close()
+
+
+def save_samurai_result(y, x, n, piece_id, starting_point, file_name):
+    f = open(file_name, "a")
+    result = "piece_id: " + str(piece_id) + " staring point " + str(starting_point) +\
+             " y: " + str(y + 1) + ", " + "x: " + str(x + 1) + ", " + "Value: " + str(n) + "\n"
+    f.write(result)
+    f.close()
