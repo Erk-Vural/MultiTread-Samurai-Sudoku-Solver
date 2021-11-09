@@ -6,6 +6,7 @@ import threading
 import pygame
 
 from io_functions import read_sudoku, check_solution_files_exist, save_samurai_result
+from plot_graph_functions import plot_sudoku_graph
 from timer import Timer
 
 # GUI
@@ -69,7 +70,7 @@ def set_number(x, y, n):
     # Displays a number on point
     font = pygame.font.SysFont('arial', int(block_size * 0.75))
     text = font.render(n, True, (0, 0, 0))
-    SCREEN.blit(text, (x+10, y+5))
+    SCREEN.blit(text, (x + 10, y + 5))
 
 
 def clear_rect(x, y):
@@ -100,6 +101,18 @@ samurai_matrix = []
 
 puzzles = [[], [], [], [], []]
 solved_puzzles = [[], [], [], [], []]
+
+times = []
+empty_points = []
+
+
+def find_empty_points():
+    counter = 0
+    for y in range(21):
+        for x in range(21):
+            counter += 1
+            if samurai_matrix[y][x] == 0:
+                empty_points.append(counter)
 
 
 # Adds spaces to samurai list to turn it to matrix
@@ -299,6 +312,8 @@ def solve(piece_id, starting_point):
                     if check(y, x, n, grid, piece_id):
                         grid[y][x] = n
 
+                        times.append(t.get_current_time())
+
                         save_samurai_result(y, x, n, piece_id, starting_point, samurai_solved_file_name)
 
                         update_point(y, x, n, piece_id)
@@ -372,7 +387,7 @@ def main():
     global samurai_solved_file_name
 
     samurai_example_file_name = "examples/samurai.txt"
-    samurai_solved_file_name = "solved/samurai-10-(result).txt"
+    samurai_solved_file_name = "solved/samurai(result).txt"
 
     # Create window
     global SCREEN
@@ -391,6 +406,8 @@ def main():
     convert_to_pieces()
 
     samurai_list_to_matrix()
+    find_empty_points()
+
     draw_grid(samurai_matrix)
 
     tread_type1 = [1]  # 5 tread 1 starting point
@@ -398,8 +415,10 @@ def main():
 
     t.start()
 
-    # solve_samurai()
-    solve_samurai_tread(tread_type2)
+    solve_samurai()
+    # solve_samurai_tread(tread_type1)
+
+    plot_sudoku_graph(times, empty_points)
 
     t.stop()
 

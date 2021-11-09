@@ -2,30 +2,25 @@ import matplotlib.pyplot as plt
 
 
 # Graphs
-# Currently it's almost what we want
 
-def get_unique_numbers(numbers):
-    list_of_unique_numbers = []
-
-    unique_numbers = set(numbers)
-
-    for number in unique_numbers:
-        list_of_unique_numbers.append(number)
-
-    return list_of_unique_numbers
-
-
-def plot_sudoku_graph(times, results):
+def plot_sudoku_graph(times, points):
     # y - Square Found
-    y = get_unique_numbers(results)
+    y = points
     # x - time
-    jump_time = (len(times) // len(y)) + 1
+    jump_time = (len(times) // len(y))
     x = times[::jump_time]
+
+    while not len(x) == len(y):
+        if len(x) > len(y):
+            x.pop(0)
+        else:
+            x.append(times[-1])
+            times.pop(-1)
 
     plt.plot(x, y)
 
-    plt.yticks(y[::10])
-    plt.xticks(x[::10])
+    plt.yticks(y[::15])
+    plt.xticks(x[::25])
 
     plt.xlabel('x - time')
     plt.ylabel('y - Square Found')

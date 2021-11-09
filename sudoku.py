@@ -71,7 +71,16 @@ t = Timer()
 puzzle = []
 
 times = []
-results = []
+empty_points = []
+
+
+def find_empty_points():
+    counter = 0
+    for y in range(9):
+        for x in range(9):
+            counter += 1
+            if puzzle[y][x] == 0:
+                empty_points.append(counter)
 
 
 # Checks col, row and block to determine if value is suitable for point
@@ -117,8 +126,6 @@ def solve(grid):
                         grid[y][x] = n
 
                         times.append(t.get_current_time())
-                        # save result to plot graph but save method is fouled, it should save each solved point
-                        results.append((y + 1) * 10 + (x + 1))
 
                         save_sudoku_result(y, x, n, sudoku_solved_file_name)
 
@@ -138,7 +145,7 @@ def solve(grid):
 
     is_puzzle_solved = True
 
-    plot_sudoku_graph(times, results)
+    plot_sudoku_graph(times, empty_points)
 
 
 def main():
@@ -163,6 +170,8 @@ def main():
     print("\n")
 
     check_solution_files_exist(sudoku_solved_file_name)
+
+    find_empty_points()
 
     draw_grid(puzzle)
 
