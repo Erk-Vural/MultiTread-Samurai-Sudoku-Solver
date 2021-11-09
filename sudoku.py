@@ -3,6 +3,7 @@ import sys
 
 from io_functions import *
 from plot_graph_functions import plot_sudoku_graph
+from samurai import possible
 from timer import Timer
 
 # GUI
@@ -66,26 +67,6 @@ times = []
 results = []
 
 
-def possible(y, x, n, grid):
-    # Check col
-    for i in range(0, 9):
-        if grid[y][i] == n:
-            return False
-    # Check row
-    for i in range(0, 9):
-        if grid[i][x] == n:
-            return False
-    # Check block
-    x0 = (x // 3) * 3
-    y0 = (y // 3) * 3
-    for i in range(0, 3):
-        for j in range(0, 3):
-            if grid[y0 + i][x0 + j] == n:
-                return False
-    # if number is not used before return true
-    return True
-
-
 # Using recursion to solve sudoku.
 # Function search for an empty point then tries all values between (1,9), if suitable
 # value found, it replaces point with value and calls a new solve. If a solve returns
@@ -104,7 +85,7 @@ def solve(grid):
         for x in range(9):
             if grid[y][x] == 0:
                 for n in range(1, 10):
-                    if possible(y, x, n, grid) and not is_solved:
+                    if possible(y, x, n, grid) and not is_puzzle_solved:
                         grid[y][x] = n
 
                         times.append(t.get_current_time())
@@ -127,7 +108,6 @@ def solve(grid):
     print("\n")
 
     is_solved = True
-    t.stop()
 
     plot_sudoku_graph(times, results)
 
@@ -154,6 +134,7 @@ def main():
 
     t.start()
     solve(puzzle)
+    t.stop()
 
     # Quit button
     while True:

@@ -2,10 +2,12 @@ import numpy as np
 import threading
 
 from io_functions import read_sudoku, check_solution_files_exist
-from sudoku import possible
 from timer import Timer
 
 # Samurai
+# Solves samurai sudoku without treads, with 5 treads and 10 treads 10 tread version has 2 thread on same puzzle and
+# starts from 2 different points
+
 sudoku_type = 2
 is_puzzle_solved = [False, False, False, False, False]
 
@@ -22,21 +24,7 @@ puzzles = [[], [], [], [], []]
 solved_puzzles = [[], [], [], [], []]
 
 
-# Convert puzzle lists to puzzle matrices
-def list_to_matrix(puzzle_list):
-    puzzle_matrix = []
-    matrix_line = []
-
-    for x in range(81):
-        matrix_line.append(puzzle_list[x])
-
-        if x % 9 == 8 and x > 8 or x == 8:
-            puzzle_matrix.append(matrix_line)
-            matrix_line = []
-    return puzzle_matrix
-
-
-# Separates puzzles to different lists
+# Takes samurai_sudoku list and separate it to 5 list pieces then to matrices
 def convert_to_pieces():
     global puzzles
 
@@ -84,8 +72,21 @@ def convert_to_pieces():
         print("\n")
 
 
-# Checks if value is suitable for point if point is at one of the conflicted block checks
-# both puzzles
+# Convert puzzle lists to puzzle matrices
+def list_to_matrix(puzzle_list):
+    puzzle_matrix = []
+    matrix_line = []
+
+    for x in range(81):
+        matrix_line.append(puzzle_list[x])
+
+        if x % 9 == 8 and x > 8 or x == 8:
+            puzzle_matrix.append(matrix_line)
+            matrix_line = []
+    return puzzle_matrix
+
+
+# Checks if value is suitable for point and if point is at one of the conflicted block checks both puzzles
 def check(y, x, n, grid, piece_id):
     add_to_x = 0
     add_to_y = 0
@@ -123,6 +124,62 @@ def check(y, x, n, grid, piece_id):
            and not is_puzzle_solved[piece_id]
 
 
+# Checks col, row and block to determine if value is suitable for point
+def possible(y, x, n, grid):
+    # Check col
+    for i in range(0, 9):
+        if grid[y][i] == n:
+            return False
+    # Check row
+    for i in range(0, 9):
+        if grid[i][x] == n:
+            return False
+    # Check block
+    x0 = (x // 3) * 3
+    y0 = (y // 3) * 3
+    for i in range(0, 3):
+        for j in range(0, 3):
+            if grid[y0 + i][x0 + j] == n:
+                return False
+    # if number is not used before return true
+    return True
+
+
+# After middle puzzle is solved function updates all puzzle's conflicted blocks
+def update_puzzles(piece_id, starting_point, grid):
+    global puzzles
+
+    if piece_id == 0:
+        for y in range(3):
+            for x in range(3):
+                puzzles[piece_id][y + 6][x + 6] = grid[y][x]
+    if piece_id == 1:
+        for y in range(3):
+            for x in range(6, 9):
+                puzzles[piece_id][y + 6][x - 6] = grid[y][x]
+    if piece_id == 3:
+        for y in range(6, 9):
+            for x in range(3):
+                puzzles[piece_id][y - 6][x + 6] = grid[y][x]
+    if piece_id == 4:
+        for y in range(6, 9):
+            for x in range(6, 9):
+                puzzles[piece_id][y - 6][x - 6] = grid[y][x]
+
+    print("Updated version of: " + str(piece_id) + ", " + str(starting_point))
+    print(np.matrix(puzzles[piece_id]))
+    print("\n")
+
+
+# Using recursion to solve sudoku.
+# Function search for an empty point then tries all values between (1,9), if suitable
+# value found, it replaces point with value and calls a new solve. If a solve returns
+# it means that there is no suitable value for the point, therefore previous point
+# assignment is false because the next point can't be found.Program returns to  previous
+# solve and replace point with 0 (empty) and search for a new possible value.
+# If a new suitable value founds a new solve called otherwise current solve return too
+# and previous point is reassigned.
+# Function works until all grid is solved.then prints solved grid
 def solve(piece_id, starting_point):
     global is_puzzle_solved
     global t
@@ -132,6 +189,7 @@ def solve(piece_id, starting_point):
     end_point = 9
     operation = 1
 
+    # If starting point is 2 loops start from reverse
     if starting_point == 2:
         head_point = 8
         end_point = -1
@@ -165,33 +223,7 @@ def solve(piece_id, starting_point):
     is_puzzle_solved[piece_id] = True
 
 
-# After middle is solved function updates all puzzles
-def update_puzzles(piece_id, starting_point, grid):
-    global puzzles
-
-    if piece_id == 0:
-        for y in range(3):
-            for x in range(3):
-                puzzles[piece_id][y + 6][x + 6] = grid[y][x]
-    if piece_id == 1:
-        for y in range(3):
-            for x in range(6, 9):
-                puzzles[piece_id][y + 6][x - 6] = grid[y][x]
-    if piece_id == 3:
-        for y in range(6, 9):
-            for x in range(3):
-                puzzles[piece_id][y - 6][x + 6] = grid[y][x]
-    if piece_id == 4:
-        for y in range(6, 9):
-            for x in range(6, 9):
-                puzzles[piece_id][y - 6][x - 6] = grid[y][x]
-
-    print("Updated version of: " + str(piece_id) + ", " + str(starting_point))
-    print(np.matrix(puzzles[piece_id]))
-    print("\n")
-
-
-# Solve samurai without threads starting from middle puzzle
+# Solve samurai without threads starting from middle puzzle then loops through other corners
 def solve_samurai():
     solve(2, 1)
 
@@ -202,7 +234,9 @@ def solve_samurai():
         solve(i, 1)
 
 
-# Solve samurai with threads starting from middle puzzle
+# Solve samurai with threads corners wait until middle puzzle is solved than other corners start at same time
+# In 10 tread version loop is same with 5 tread but inside it loops 2 times and creates 10 treads, treads belongs to
+# same puzzle starts after one another. Some times one tread can solve all puzzle by itself might be improved later
 def solve_samurai_tread(starting_points):
     threads = []
 
@@ -216,8 +250,8 @@ def solve_samurai_tread(starting_points):
         thread.join()
 
 
+# Other treads waits until middle puzzle solved then updates blocks and start solving
 def manage_treads(piece_id, starting_point):
-
     print(str(piece_id) + ", " + str(starting_point) + " is started\n")
 
     if piece_id == 2:
@@ -243,10 +277,10 @@ def main():
 
     convert_to_pieces()
 
-    t.start()
+    tread_type1 = [1]  # 5 tread 1 starting point
+    tread_type2 = [1, 2]  # 10 tread 2 starting point
 
-    tread_type1 = [1]
-    tread_type2 = [1, 2]
+    t.start()
 
     # solve_samurai()
     solve_samurai_tread(tread_type1)
