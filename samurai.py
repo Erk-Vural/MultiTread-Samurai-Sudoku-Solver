@@ -158,7 +158,7 @@ def solve(piece_id, starting_point):
             matrix_line.append(grid[y][x])
         solved_puzzles[piece_id].append(matrix_line)
 
-    print("Final version of: " + str(piece_id) + ", " + str(starting_point))
+    print("Final version of: " + str(piece_id))
     print(np.matrix(solved_puzzles[piece_id]))
     print("\n")
 
@@ -198,7 +198,7 @@ def solve_samurai():
     for i in range(5):
         if i == 2:
             continue
-        update_puzzles(i, solved_puzzles[2], 1)
+        update_puzzles(i, 1, solved_puzzles[2])
         solve(i, 1)
 
 
@@ -245,8 +245,11 @@ def main():
 
     t.start()
 
+    tread_type1 = [1]
+    tread_type2 = [1, 2]
+
     # solve_samurai()
-    solve_samurai_tread([1, 2])
+    solve_samurai_tread(tread_type1)
 
     t.stop()
 
