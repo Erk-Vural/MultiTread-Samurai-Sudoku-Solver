@@ -4,7 +4,6 @@ import sys
 
 from io_functions import *
 from plot_graph_functions import plot_sudoku_graph
-from samurai import possible
 from timer import Timer
 
 # GUI
@@ -18,26 +17,16 @@ WINDOW_HEIGHT = block_size * block_amount
 WINDOW_WIDTH = block_size * block_amount
 
 
-def set_number(x, y, n):
-    # Displays a number on point
-    font = pygame.font.SysFont('arial', block_size)
-    text = font.render(n, True, (0, 0, 0))
-    SCREEN.blit(text, (x, y))
-
-
-def clear_rect(x, y):
-    rect = pygame.Rect(x, y, block_size, block_size)
-    SCREEN.fill(light_gray, rect)
-    pygame.draw.rect(SCREEN, black, rect, 1)
-
-
-def draw_grid():
+def draw_grid(grid):
     for x in range(0, WINDOW_WIDTH, block_size):
         for y in range(0, WINDOW_HEIGHT, block_size):
-            rect = pygame.Rect(x, y, block_size, block_size)
-            pygame.draw.rect(SCREEN, black, rect, 1)
+            if grid[y // block_size][x // block_size] == -1:
+                continue
 
-            value = str(puzzle[y // block_size][x // block_size])
+            rect = pygame.Rect(x, y, block_size, block_size)
+            pygame.draw.rect(SCREEN, black, rect, 2)
+
+            value = str(grid[y // block_size][x // block_size])
             set_number(x, y, value)
 
     pygame.display.update()
@@ -55,6 +44,19 @@ def update_point(y, x, n):
     pygame.display.update()
 
 
+def set_number(x, y, n):
+    # Displays a number on point
+    font = pygame.font.SysFont('arial', block_size)
+    text = font.render(n, True, (0, 0, 0))
+    SCREEN.blit(text, (x, y))
+
+
+def clear_rect(x, y):
+    rect = pygame.Rect(x, y, block_size, block_size)
+    SCREEN.fill(light_gray, rect)
+    pygame.draw.rect(SCREEN, black, rect, 2)
+
+
 # Sudoku
 # Checks row col and block to confirm "n" is available for selected point
 sudoku_example_file_name = "examples/9x9.txt"
@@ -68,6 +70,27 @@ puzzle = []
 
 times = []
 results = []
+
+
+# Checks col, row and block to determine if value is suitable for point
+def possible(y, x, n, grid):
+    # Check col
+    for i in range(0, 9):
+        if grid[y][i] == n:
+            return False
+    # Check row
+    for i in range(0, 9):
+        if grid[i][x] == n:
+            return False
+    # Check block
+    x0 = (x // 3) * 3
+    y0 = (y // 3) * 3
+    for i in range(0, 3):
+        for j in range(0, 3):
+            if grid[y0 + i][x0 + j] == n:
+                return False
+    # if number is not used before return true
+    return True
 
 
 # Using recursion to solve examples.
@@ -139,7 +162,7 @@ def main():
 
     check_solution_files_exist(sudoku_solved_file_name)
 
-    draw_grid()
+    draw_grid(puzzle)
 
     t.start()
     solve(puzzle)

@@ -1,8 +1,45 @@
+import sys
+
 import numpy as np
 import threading
 
+import pygame
+
 from io_functions import read_sudoku, check_solution_files_exist, save_samurai_result
 from timer import Timer
+
+# GUI
+black = (0, 0, 0)
+light_gray = (230, 230, 230)
+
+block_amount = 21
+block_size = 40
+
+WINDOW_HEIGHT = block_size * block_amount
+WINDOW_WIDTH = block_size * block_amount
+
+
+def draw_grid(grid):
+    for x in range(0, WINDOW_WIDTH, block_size):
+        for y in range(0, WINDOW_HEIGHT, block_size):
+            if grid[y // block_size][x // block_size] == -1:
+                continue
+
+            rect = pygame.Rect(x, y, block_size, block_size)
+            pygame.draw.rect(SCREEN, black, rect, 2)
+
+            value = str(grid[y // block_size][x // block_size])
+            set_number(x, y, value)
+
+    pygame.display.update()
+
+
+def set_number(x, y, n):
+    # Displays a number on point
+    font = pygame.font.SysFont('arial', block_size)
+    text = font.render(n, True, (0, 0, 0))
+    SCREEN.blit(text, (x, y))
+
 
 # Samurai
 # Solves samurai examples without treads, with 5 treads and 10 treads 10 tread version has 2 thread on same puzzle and
@@ -22,8 +59,26 @@ t = Timer()
 # puzzle[3] is bottom_left
 # puzzle[4] is bottom_right
 samurai_grid = []
+samurai_matrix = []
+
 puzzles = [[], [], [], [], []]
 solved_puzzles = [[], [], [], [], []]
+
+
+# Adds spaces to samurai list to turn it to matrix
+def samurai_list_to_matrix():
+    global samurai_matrix
+
+    samurai_matrix = samurai_grid
+
+    for y in range(21):
+        if y < 6 or y > 14:
+            for x in range(3):
+                samurai_matrix[y].insert(9 + x, -1)
+        if 8 < y < 12:
+            for x in range(6):
+                samurai_matrix[y].insert(x, -1)
+                samurai_matrix[y].append(-1)
 
 
 # Takes samurai_sudoku list and separate it to 5 list pieces then to matrices
@@ -69,23 +124,24 @@ def convert_to_pieces():
                     temp_puzzles[4].append(samurai_grid[y][x])
 
     for i in range(5):
-        puzzles[i] = list_to_matrix(temp_puzzles[i])
+        puzzles[i] = list_to_matrix(temp_puzzles[i], 9)
         print(np.matrix(puzzles[i]))
         print("\n")
 
 
 # Convert puzzle lists to puzzle matrices
-def list_to_matrix(puzzle_list):
-    puzzle_matrix = []
+def list_to_matrix(old_list, width):
+    new_matrix = []
     matrix_line = []
 
-    for x in range(81):
-        matrix_line.append(puzzle_list[x])
+    for x in range(width * width):
+        matrix_line.append(old_list[x])
 
-        if x % 9 == 8 and x > 8 or x == 8:
-            puzzle_matrix.append(matrix_line)
+        if x % width == width - 1 and x > width - 1 or x == width - 1:
+            new_matrix.append(matrix_line)
             matrix_line = []
-    return puzzle_matrix
+
+    return new_matrix
 
 
 # Checks if value is suitable for point and if point is at one of the conflicted block checks both puzzles
@@ -279,6 +335,13 @@ def main():
     samurai_example_file_name = "examples/samurai.txt"
     samurai_solved_file_name = "solved/samurai(result).txt"
 
+    # Create window
+    global SCREEN
+
+    pygame.init()
+    SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    SCREEN.fill(light_gray)
+
     samurai_grid = read_sudoku(samurai_example_file_name)
     print("Read Version: ")
     print(samurai_grid)
@@ -288,15 +351,25 @@ def main():
 
     convert_to_pieces()
 
+    samurai_list_to_matrix()
+    draw_grid(samurai_matrix)
+
     tread_type1 = [1]  # 5 tread 1 starting point
     tread_type2 = [1, 2]  # 10 tread 2 starting point
 
     t.start()
 
-    solve_samurai()
+    # solve_samurai()
     # solve_samurai_tread(tread_type1)
 
     t.stop()
+
+    # Quit button
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
 
 
 if __name__ == "__main__":
