@@ -1,12 +1,14 @@
 import numpy as np
+import threading
+import time
 
-from file_functions import read_sudoku, check_solution_files_exist
+from io_functions import read_sudoku, check_solution_files_exist
 from sudoku import possible
 from timer import Timer
 
 # Samurai
 sudoku_type = 2
-is_solved = False
+is_solved = [False, False, False, False, False]
 
 t = Timer()
 
@@ -119,7 +121,7 @@ def check(y, x, n, grid, piece_id):
 
     return possible(y, x, n, grid) \
            and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
-           and not is_solved
+           and not is_solved[piece_id]
 
 
 def solve(piece_id):
@@ -153,22 +155,7 @@ def solve(piece_id):
     print(np.matrix(solved_puzzles[piece_id]))
     print("\n")
 
-    is_solved = True
-
-
-# Solve samurai without threads starting from middle puzzle
-def solve_samurai():
-    global is_solved
-
-    solve(2)
-    is_solved = False
-
-    for i in range(5):
-        if i == 2:
-            continue
-        update_puzzles(i, solved_puzzles[2])
-        solve(i)
-        is_solved = False
+    is_solved[piece_id] = True
 
 
 # After middle is solved function updates all puzzles
@@ -197,6 +184,44 @@ def update_puzzles(piece_id, grid):
     print("\n")
 
 
+# Solve samurai without threads starting from middle puzzle
+def solve_samurai():
+    solve(2)
+
+    for i in range(5):
+        if i == 2:
+            continue
+        update_puzzles(i, solved_puzzles[2])
+        solve(i)
+
+
+# Solve samurai with 5 threads starting from middle puzzle
+# Solve samurai with 5 threads starting from middle puzzle
+def solve_samurai_5_tread():
+    threads = []
+
+    for i in range(5):
+        trd = threading.Thread(target=manage_five_treads, args=[i])
+        trd.start()
+        threads.append(trd)
+
+    for thread in threads:
+        thread.join()
+
+
+def manage_five_treads(piece_id):
+    print(str(piece_id) + "is started\n")
+
+    if piece_id == 2:
+        solve(2)
+    else:
+        while not is_solved[2]:
+            print(str(piece_id) + "is waiting\n")
+        if is_solved[2]:
+            update_puzzles(piece_id, solved_puzzles[2])
+            solve(piece_id)
+
+
 def main():
     global samurai_grid
 
@@ -209,7 +234,12 @@ def main():
 
     convert_to_pieces()
 
-    solve_samurai()
+    t.start()
+
+    # solve_samurai()
+    solve_samurai_5_tread()
+
+    t.stop()
 
 
 if __name__ == "__main__":

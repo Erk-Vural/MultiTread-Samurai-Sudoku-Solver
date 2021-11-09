@@ -1,8 +1,8 @@
 import pygame as pygame
 import sys
 
-from file_functions import *
-from graphs import plot_sudoku_graph
+from io_functions import *
+from plot_graph_functions import plot_sudoku_graph
 from timer import Timer
 
 # GUI

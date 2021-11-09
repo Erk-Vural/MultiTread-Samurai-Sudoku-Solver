@@ -2,13 +2,13 @@ import concurrent.futures
 import threading
 import time
 
-are_blocks_solved = [[0, False], [1, False], [], [3, False], [4, False]]
+are_solved = [[0, False], [1, False], [], [3, False], [4, False]]
 
 threads = [[], [], [], [], []]
 
 
 def check_block(y, x, grid):
-    global are_blocks_solved
+    global are_solved
 
     if y == 3 and not are_solved[0][1]:
         print("1. part is_solved in puzzle 2\n")
