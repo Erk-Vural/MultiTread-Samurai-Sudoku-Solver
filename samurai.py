@@ -119,8 +119,8 @@ def check(y, x, n, grid, piece_id):
                 check_piece_id = 4
 
     return possible(y, x, n, grid) \
-        and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
-        and not is_puzzle_solved[piece_id]
+           and possible(y + add_to_y, x + add_to_x, n, puzzles[check_piece_id]) \
+           and not is_puzzle_solved[piece_id]
 
 
 def solve(piece_id, starting_point):
@@ -203,33 +203,32 @@ def solve_samurai():
 
 
 # Solve samurai with threads starting from middle puzzle
-def solve_samurai_tread(tread_number, starting_points):
+def solve_samurai_tread(starting_points):
     threads = []
 
-    for i in range(tread_number):
-        trd_list = [0, 1, 2, 3, 4]
-        trd_index = i % 5
-
-        trd = threading.Thread(target=manage_treads, args=[trd_list[trd_index], starting_points])
-        trd.start()
-        threads.append(trd)
+    for i in range(5):
+        for starting_point in starting_points:
+            trd = threading.Thread(target=manage_treads, args=[i, starting_point])
+            trd.start()
+            threads.append(trd)
 
     for thread in threads:
         thread.join()
 
 
-def manage_treads(piece_id, starting_points):
-    for starting_point in starting_points:
-        print(str(piece_id) + ", " + str(starting_point) + " is started\n")
+def manage_treads(piece_id, starting_point):
 
-        if piece_id == 2:
+    print(str(piece_id) + ", " + str(starting_point) + " is started\n")
+
+    if piece_id == 2:
+        solve(piece_id, starting_point)
+    else:
+        while not is_puzzle_solved[2]:
+            print(str(piece_id) + ", " + str(starting_point) + " is waiting\n")
+            pass
+        if is_puzzle_solved[2]:
+            update_puzzles(piece_id, starting_point, solved_puzzles[2])
             solve(piece_id, starting_point)
-        else:
-            while not is_puzzle_solved[2]:
-                print(str(piece_id) + ", " + str(starting_point) + " is waiting\n")
-            if is_puzzle_solved[2]:
-                update_puzzles(piece_id, starting_point, solved_puzzles[2])
-                solve(piece_id, starting_point)
 
 
 def main():
@@ -247,7 +246,7 @@ def main():
     t.start()
 
     # solve_samurai()
-    solve_samurai_tread(10, [1, 2])
+    solve_samurai_tread([1, 2])
 
     t.stop()
 
