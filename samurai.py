@@ -390,7 +390,7 @@ def main():
     global samurai_solved_file_name
 
     samurai_example_file_name = "examples/samurai.txt"
-    samurai_solved_file_name = "solved/samurai-10-(result).txt"
+    samurai_solved_file_name = "solved/samurai(result).txt"
 
     # Create window
     global SCREEN
