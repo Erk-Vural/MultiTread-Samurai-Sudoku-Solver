@@ -74,6 +74,7 @@ def set_number(x, y, n):
     SCREEN.blit(text, (x + 10, y + 5))
 
 
+# clear previous number from point
 def clear_rect(x, y):
     rect = pygame.Rect(x, y, block_size, block_size)
     SCREEN.fill(light_gray, rect)
@@ -134,6 +135,21 @@ def samurai_list_to_matrix():
                 samurai_matrix[y].append(-1)
 
 
+# Convert puzzle lists to puzzle matrices
+def puzzle_list_to_matrix(old_list, width):
+    new_matrix = []
+    matrix_line = []
+
+    for x in range(width * width):
+        matrix_line.append(old_list[x])
+
+        if x % width == width - 1 and x > width - 1 or x == width - 1:
+            new_matrix.append(matrix_line)
+            matrix_line = []
+
+    return new_matrix
+
+
 # Takes samurai_sudoku list and separate it to 5 list pieces then to matrices
 def convert_to_pieces():
     global puzzles
@@ -177,24 +193,9 @@ def convert_to_pieces():
                     temp_puzzles[4].append(samurai_grid[y][x])
 
     for i in range(5):
-        puzzles[i] = list_to_matrix(temp_puzzles[i], 9)
+        puzzles[i] = puzzle_list_to_matrix(temp_puzzles[i], 9)
         print(np.matrix(puzzles[i]))
         print("\n")
-
-
-# Convert puzzle lists to puzzle matrices
-def list_to_matrix(old_list, width):
-    new_matrix = []
-    matrix_line = []
-
-    for x in range(width * width):
-        matrix_line.append(old_list[x])
-
-        if x % width == width - 1 and x > width - 1 or x == width - 1:
-            new_matrix.append(matrix_line)
-            matrix_line = []
-
-    return new_matrix
 
 
 # Checks if value is suitable for point and if point is at one of the conflicted block checks both puzzles
