@@ -1,4 +1,5 @@
 import sys
+import time
 
 import numpy as np
 import threading
@@ -102,10 +103,12 @@ samurai_matrix = []
 puzzles = [[], [], [], [], []]
 solved_puzzles = [[], [], [], [], []]
 
+# Data using for plot graph
 times = []
 empty_points = []
 
 
+# Find number of empty point to using point-time graph
 def find_empty_points():
     counter = 0
     for y in range(21):
@@ -374,8 +377,7 @@ def manage_treads(piece_id, starting_point):
         solve(piece_id, starting_point)
     else:
         while not is_puzzle_solved[2]:
-            print(str(piece_id) + ", " + str(starting_point) + " is waiting\n")
-            pass
+            time.sleep(0.1)
         if is_puzzle_solved[2]:
             update_puzzles(piece_id, starting_point, solved_puzzles[2])
             solve(piece_id, starting_point)
@@ -387,7 +389,7 @@ def main():
     global samurai_solved_file_name
 
     samurai_example_file_name = "examples/samurai.txt"
-    samurai_solved_file_name = "solved/samurai(result).txt"
+    samurai_solved_file_name = "solved/samurai-10-(result).txt"
 
     # Create window
     global SCREEN
@@ -415,8 +417,8 @@ def main():
 
     t.start()
 
-    solve_samurai()
-    # solve_samurai_tread(tread_type1)
+    # solve_samurai()
+    solve_samurai_tread(tread_type2)
 
     plot_sudoku_graph(times, empty_points)
 
