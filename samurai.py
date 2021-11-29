@@ -389,8 +389,8 @@ def main():
     global samurai_example_file_name
     global samurai_solved_file_name
 
-    samurai_example_file_name = "examples/samurai.txt"
-    samurai_solved_file_name = "solved/samurai(result).txt"
+    samurai_example_file_name = "examples/samurai_1.txt"
+    samurai_solved_file_name = "solved/samurai_1(result).txt"
 
     # Create window
     global SCREEN
@@ -418,8 +418,8 @@ def main():
 
     t.start()
 
-    # solve_samurai()
-    solve_samurai_tread(tread_type2)
+    solve_samurai()
+    # solve_samurai_tread(tread_type2)
 
     plot_sudoku_graph(times, empty_points)
 
